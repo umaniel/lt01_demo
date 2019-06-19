@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>list</title>
+    <script src="js/jquery.js"></script>
+    <script src="js/vue.js"></script>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body class="light">
+    <button type="button" onclick="toggleMode()" class="mode"></button>
+    <article id="list">
+      <section id="jq">
+        <p>LIST - jQuery</p>
+        <p>
+          残り
+          <span id="count"></span>
+          件
+        </p>
+        <div id="add">
+          <input id="strAdd" placeholder="Please enter your new task" onkeypress="jqSubmit()" />
+          <button type="button" onclick="jqFncAdd()"></button>
+        </div>
+        <div id="task">
+          <p>task</p>
+          <ul class="wrapper"></ul>
+        </div>
+        <div id="done">
+          <p>done</p>
+          <ul class="wrapper"></ul>
+        </div>
+      </section>
+
+      <section id="vue">
+        <p>LIST - Vue.js</p>
+        <p>残り {{ taskList.filter(v => !v.isDone).length }} 件</p>
+        <div id="add">
+          <input v-model="strTask" placeholder="Please enter your new task" @keyup.enter="vueFncAdd()" :class='{"ok":strTask}' />
+          <button type="button" @click="vueFncAdd()"></button>
+        </div>
+        <div id="task">
+          <p>task</p>
+          <ul class="wrapper">
+            <transition-group>
+              <li v-for="(item, index) in taskList.filter(v => !v.isDone)" :key="item.id">
+                {{ item.str }}
+                <span class="controller">
+                  <span class="icon-done" @click="vueFncDone(item.id)"></span>
+                  <span class="icon-remove" @click="vueFncRemove(item.id)"></span>
+                </span>
+              </li>
+            </transition-group>
+          </ul>
+        </div>
+        <div id="done">
+          <p>done</p>
+          <ul class="wrapper">
+            <transition-group>
+              <li v-for="(item, index) in taskList.filter(v => v.isDone)" :key="item.id">
+                {{ item.str }}
+                <span class="controller">
+                  <span class="icon-remove" @click="vueFncRemove(item.id)"></span>
+                </span>
+              </li>
+            </transition-group>
+          </ul>
+        </div>
+      </section>
+    </article>
+    <!--  -->
+    <script>
+      // jQuery
+      const initialTask = [
+        { id: 1, str: 'その1', isDone: false },
+        { id: 2, str: 'その2', isDone: false },
+        { id: 3, str: 'その3', isDone: false },
+        { id: 4, str: 'その4', isDone: true },
+        { id: 5, str: 'その5', isDone: false },
+        { id: 6, str: 'その6', isDone: false },
+      ]
+
+      let jqNowId = 1
+      let jqTask = []
+
+      const jqFncDone = function(_self) {
+        $('#jq div#done ul').append(`
+            <li>${$(_self)
+              .parents('li')
+              .text()}
+              <span class='controller'>
+                <span class='icon-remove' onclick='jqFncRemove(this)'></span>
+              </span>
+            </li> `)
+        $(_self)
+          .parents('li')
+          .remove()
+        $('#count').text($('#jq div#task li').length)
+      }
+
+      const jqFncRemove = function(_self) {
+        $(_self)
+          .parents('li')
+          .remove()
+        $('#count').text($('#jq div#task li').length)
+      }
+
+      const jqFncAdd = function() {
+        $('#strAdd').val() &&
+          $('#jq div#task ul').append(`
+              <li>${$('#strAdd').val()}
+                <span class='controller'>
+                  <span class='icon-done' onclick='jqFncDone(this)'></span>
+                  <span class='icon-remove' onclick='jqFncRemove(this)'></span>
+                </span>
+              </li> `)
+
+        jqTask.push({
+          id: jqNowId,
+          str: $('#strAdd').val(),
+          isDone: false,
+        })
+        jqNowId++
+        $('#count').text($('#jq div#task li').length)
+        $('#strAdd')
+          .val('')
+          .removeClass('ok')
+      }
+
+      const jqSubmit = () => {
+        if ($('#strAdd').val()) {
+          $('#strAdd').addClass('ok')
+        } else {
+          $('#strAdd').removeClass('ok')
+        }
+        window.event.keyCode == 13 && jqFncAdd()
+      }
+
+      $(function() {
+        jqTask = [...initialTask]
+        jqTask.forEach(task => {
+          task.isDone
+            ? $('#jq div#done ul').append(`
+              <li>${task.str}
+                <span class='controller'>
+                  <span class='icon-remove' onclick=jqFncRemove(this)'></span>
+                </span>
+              </li> `)
+            : $('#jq div#task ul').append(`
+              <li>${task.str}
+                <span class='controller'>
+                  <span class='icon-done' onclick='jqFncDone(this)'></span>
+                  <span class='icon-remove' onclick='jqFncRemove(this)'></span>
+                </span>
+              </li> `)
+          jqNowId++
+        })
+        $('#count').text($('#jq div#task li').length)
+      })
+
+      // ----------------------
+      // Vue
+      new Vue({
+        el: '#vue',
+        data: {
+          strTask: '',
+          taskList: [],
+          vueNextId: 1,
+        },
+        created() {
+          this.taskList = [...initialTask]
+          this.vueNextId = this.taskList.length + 1
+        },
+        methods: {
+          vueFncDone(id) {
+            const targetTask = this.taskList.find(item => item.id == id)
+            targetTask.isDone = true
+          },
+          vueFncRemove(id) {
+            const targetTask = this.taskList.find(item => item.id == id)
+            this.taskList.splice(this.taskList.indexOf(targetTask), 1)
+          },
+          vueFncAdd() {
+            if (this.strTask) {
+              this.vueNextId++
+              this.taskList.push({
+                id: this.vueNextId,
+                str: this.strTask,
+                isDone: false,
+              })
+              this.strTask = ''
+            }
+          },
+        },
+      })
+    </script>
+
+    <script>
+      const toggleMode = () => {
+        $('body').toggleClass('light dark')
+      }
+    </script>
+
+    <!--  -->
+  </body>
+</html>

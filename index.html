@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>portfolio</title>
+    <script src="js/vue.js"></script>
+    <script src="js/jquery.js"></script>
+
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- <button type="button" onclick="toggleMode()" class="mode"></button> -->
+      <div class="controller">
+        <button @click='nowSelect = "jq"' :class='{"active":nowSelect == "jq"}'>jQuery</button>
+        <button @click='nowSelect = "vue"' :class='{"active":nowSelect == "vue"}'>vue</button>
+      </div>
+      <article v-cloak>
+        <section class="home--left dark" :class='isActive("left")' @click='nowContent = "left"'>
+          <h1 v-if="!nowContent">demo 1</h1>
+          <div v-show='nowContent == "left"'>
+            <article id="pass">
+              <section id="psJq" v-show='nowSelect == "jq"'>
+                <p>PASSWORD - jQuery</p>
+                <div class="wrapper show">
+                  <input type="password" class="error" placeholder="Please enter your new password" />
+                  <span class="icon" onclick="jqToggleMask(this)"></span>
+                </div>
+                <p id="notice">ERROR</p>
+              </section>
+
+              <section id="vue" v-show='nowSelect == "vue"'>
+                <p>PASSWORD - Vue.js</p>
+                <div class="wrapper" :class="wrapCls">
+                  <input :type="inputType" :class="errChkCls" placeholder="Please enter your new password" v-model="strPassword" />
+                  <span class="icon" @click="isMask = !isMask"></span>
+                  <p>{{ strNotice }}</p>
+                </div>
+              </section>
+            </article>
+          </div>
+        </section>
+
+        <section class="home--center" @click='nowContent = ""'></section>
+
+        <section class="home--right light" :class='isActive("right")' @click='nowContent = "right"'>
+          <h1 v-if="!nowContent">demo 2</h1>
+          <div v-show='nowContent == "right"'>
+            <article id="list">
+              <section id="jq" v-show='nowSelect == "jq"'>
+                <p>LIST - jQuery</p>
+                <p>
+                  残り
+                  <span id="count"></span>
+                  件
+                </p>
+                <div id="add">
+                  <input id="strAdd" placeholder="Please enter your new task" onkeypress="jqSubmit()" />
+                  <button type="button" onclick="jqFncAdd()"></button>
+                </div>
+                <div id="task">
+                  <p>task</p>
+                  <ul class="wrapper"></ul>
+                </div>
+                <div id="done">
+                  <p>done</p>
+                  <ul class="wrapper"></ul>
+                </div>
+              </section>
+
+              <section id="vue" v-show='nowSelect == "vue"'>
+                <p>LIST - Vue.js</p>
+                <p>残り {{ taskList.filter(v => !v.isDone).length }} 件</p>
+                <div id="add">
+                  <input v-model="strTask" placeholder="Please enter your new task" @keyup.enter="vueFncAdd()" :class='{"ok":strTask}' />
+                  <button type="button" @click="vueFncAdd()"></button>
+                </div>
+                <div id="task">
+                  <p>task</p>
+                  <ul class="wrapper">
+                    <transition-group>
+                      <li v-for="(item, index) in taskList.filter(v => !v.isDone)" :key="item.id">
+                        {{ item.str }}
+                        <span class="controller">
+                          <span class="icon-done" @click="vueFncDone(item.id)"></span>
+                          <span class="icon-remove" @click="vueFncRemove(item.id)"></span>
+                        </span>
+                      </li>
+                    </transition-group>
+                  </ul>
+                </div>
+                <div id="done">
+                  <p>done</p>
+                  <ul class="wrapper">
+                    <transition-group>
+                      <li v-for="(item, index) in taskList.filter(v => v.isDone)" :key="item.id">
+                        {{ item.str }}
+                        <span class="controller">
+                          <span class="icon-remove" @click="vueFncRemove(item.id)"></span>
+                        </span>
+                      </li>
+                    </transition-group>
+                  </ul>
+                </div>
+              </section>
+            </article>
+          </div>
+        </section>
+      </article>
+    </div>
+    <script>
+      const initialTask = [
+        { id: 1, str: 'その1', isDone: false },
+        { id: 2, str: 'その2', isDone: false },
+        { id: 3, str: 'その3', isDone: false },
+        { id: 4, str: 'その4', isDone: true },
+        { id: 5, str: 'その5', isDone: false },
+        { id: 6, str: 'その6', isDone: false },
+      ]
+
+      const toggleMode = () => {
+        $('body').toggleClass('light dark')
+      }
+    </script>
+    <script>
+      new Vue({
+        el: '#app',
+        data: {
+          nowContent: '',
+          strTask: '',
+          taskList: [],
+          vueNextId: 1,
+          strPassword: '',
+          isMask: false,
+          nowSelect: 'jq',
+        },
+        computed: {
+          wrapCls: function() {
+            return this.isMask ? 'hide' : 'show'
+          },
+          inputType: function() {
+            return this.isMask ? 'text' : 'password'
+          },
+          isValidChk: function() {
+            return /[ -~]{8,}/.test(this.strPassword)
+          },
+          errChkCls: function() {
+            return this.isValidChk ? 'ok' : 'error'
+          },
+          strNotice: function() {
+            return this.isValidChk ? 'OK' : 'ERROR'
+          },
+        },
+        created() {
+          this.taskList = [...initialTask]
+          this.vueNextId = this.taskList.length + 1
+        },
+        methods: {
+          isActive(target) {
+            return !this.nowContent ? '' : this.nowContent == target ? 'active' : 'disactive'
+          },
+          move(target) {
+            location.href = `${target}.html`
+          },
+          vueFncDone(id) {
+            const targetTask = this.taskList.find(item => item.id == id)
+            targetTask.isDone = true
+          },
+          vueFncRemove(id) {
+            const targetTask = this.taskList.find(item => item.id == id)
+            this.taskList.splice(this.taskList.indexOf(targetTask), 1)
+          },
+          vueFncAdd() {
+            if (this.strTask) {
+              this.vueNextId++
+              this.taskList.push({
+                id: this.vueNextId,
+                str: this.strTask,
+                isDone: false,
+              })
+              this.strTask = ''
+            }
+          },
+        },
+      })
+    </script>
+
+    <script>
+      // jQuery
+
+      // PASSWORD
+      // --------
+      const jqToggleMask = function(_self) {
+        const parent = $(_self).parent('div.wrapper')
+        const child = parent.children('input')
+        parent.toggleClass('show hide')
+        child.attr('type', parent.hasClass('show') ? 'password' : 'text')
+      }
+
+      let jqNowId = 1
+      let jqTask = []
+
+      const jqFncDone = function(_self) {
+        $('#jq div#done ul').append(`
+                              <li>${$(_self)
+                                .parents('li')
+                                .text()}
+                                <span class='controller'>
+                                  <span class='icon-remove' onclick='jqFncRemove(this)'></span>
+                                </span>
+                              </li> `)
+        $(_self)
+          .parents('li')
+          .remove()
+        $('#count').text($('#jq div#task li').length)
+      }
+
+      const jqFncRemove = function(_self) {
+        $(_self)
+          .parents('li')
+          .remove()
+        $('#count').text($('#jq div#task li').length)
+      }
+
+      const jqFncAdd = function() {
+        $('#strAdd').val() &&
+          $('#jq div#task ul').append(`
+                                <li>${$('#strAdd').val()}
+                                  <span class='controller'>
+                                    <span class='icon-done' onclick='jqFncDone(this)'></span>
+                                    <span class='icon-remove' onclick='jqFncRemove(this)'></span>
+                                  </span>
+                                </li> `)
+        jqTask.push({
+          id: jqNowId,
+          str: $('#strAdd').val(),
+          isDone: false,
+        })
+        jqNowId++
+        $('#count').text($('#jq div#task li').length)
+        $('#strAdd')
+          .val('')
+          .removeClass('ok')
+      }
+
+      const jqSubmit = () => {
+        if ($('#strAdd').val()) {
+          $('#strAdd').addClass('ok')
+        } else {
+          $('#strAdd').removeClass('ok')
+        }
+        window.event.keyCode == 13 && jqFncAdd()
+      }
+
+      $('#pass #psJq input')
+        .keydown(function() {
+          if (/[ -~]{8,}/.test($(this).val())) {
+            $(this)
+              .removeClass('error')
+              .addClass('ok')
+            $('p#notice').text('OK')
+          } else {
+            $(this)
+              .addClass('error')
+              .removeClass('ok')
+            $('p#notice').text('ERROR')
+          }
+        })
+        .change(function() {
+          if (/[ -~]{8,}/.test($(this).val())) {
+            $(this)
+              .removeClass('error')
+              .addClass('ok')
+            $('p#notice').text('OK')
+          } else {
+            $(this)
+              .addClass('error')
+              .removeClass('ok')
+            $('p#notice').text('ERROR')
+          }
+        })
+
+      $(function() {
+        jqTask = [...initialTask]
+        jqTask.forEach(task => {
+          task.isDone
+            ? $('#jq div#done ul').append(`
+                                <li>${task.str}
+                                  <span class='controller'>
+                                    <span class='icon-remove' onclick='jqFncRemove(this)'></span>
+                                  </span>
+                                </li> `)
+            : $('#jq div#task ul').append(`
+                                <li>${task.str}
+                                  <span class='controller'>
+                                    <span class='icon-done' onclick='jqFncDone(this)'></span>
+                                    <span class='icon-remove' onclick='jqFncRemove(this)'></span>
+                                  </span>
+                                </li> `)
+          jqNowId++
+        })
+        $('#count').text($('#jq div#task li').length)
+      })
+    </script>
+  </body>
+</html>

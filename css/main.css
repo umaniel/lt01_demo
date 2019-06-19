@@ -1,0 +1,108 @@
+.controller {
+  position: absolute;
+  z-index: 999;
+}
+
+.controller > .active {
+  border: 1px solid #409eff;
+  color: #fefefe;
+  background-color: #409eff;
+  border-radius: 4px;
+  outline: none;
+}
+
+h1 {
+  text-align: center;
+  margin: auto;
+  position: relative;
+  top: 50%;
+  user-select: none;
+}
+
+body,
+#app {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+article {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  /* grid: 100%/ 50% 50%; */
+}
+
+article section {
+  transition: 0.4s;
+}
+.home--left {
+  background-color: #333;
+  color: #fefefe;
+  width: 100%;
+  height: 50%;
+}
+.home--right {
+  background-color: #ddd;
+  width: 100%;
+  height: 50%;
+}
+.home--center {
+  position: absolute;
+  opacity: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  width: 150px;
+  height: 150px;
+  background: #fefefe;
+  z-index: 999;
+  border-radius: 150px;
+}
+[class*='home--'].active {
+  height: 100%;
+}
+[class*='home--'].disactive {
+  height: 0%;
+}
+
+.active + .home--center {
+  opacity: 1;
+  top: 100%;
+}
+.active + .home--center:before {
+  content: 'back';
+  position: absolute;
+  top: 37px;
+  text-align: center;
+  width: 148px;
+}
+
+.disactive + .home--center {
+  opacity: 1;
+  top: -100%;
+}
+.disactive + .home--center:before {
+  content: 'back';
+  position: absolute;
+  bottom: 30px;
+  text-align: center;
+  width: 148px;
+}
+
+.cover {
+  display: none;
+  position: absolute;
+  text-align: center;
+  width: 100%;
+  font-size: 200px;
+  margin: 0;
+  animation: cover--color 10s alternate infinite;
+  pointer-events: none;
+  user-select: none;
+}
