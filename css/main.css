@@ -63,6 +63,7 @@ article section {
   background: #fefefe;
   z-index: 999;
   border-radius: 150px;
+  pointer-events: none;
 }
 [class*='home--'].active {
   height: 100%;
@@ -79,6 +80,7 @@ article section {
 .active + .home--center {
   opacity: 1;
   top: 100%;
+  pointer-events: all;
 }
 .active + .home--center:before {
   content: 'back';
@@ -91,6 +93,7 @@ article section {
 .disactive + .home--center {
   opacity: 1;
   top: -100%;
+  pointer-events: all;
 }
 .disactive + .home--center:before {
   content: 'back';
