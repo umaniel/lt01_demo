@@ -145,7 +145,7 @@
             return this.isMask ? 'text' : 'password'
           },
           isValidChk() {
-            return /[ -~]{8,}/.test(this.strPassword)
+            return /^[ -~]{8,}$/.test(this.strPassword)
           },
           errChkCls() {
             return this.isValidChk ? 'ok' : 'error'
@@ -257,7 +257,7 @@
 
       $('#pass #psJq input')
         .keydown(function() {
-          if (/[ -~]{8,}/.test($(this).val())) {
+          if (/^[ -~]{8,}$/.test($(this).val())) {
             $(this)
               .removeClass('error')
               .addClass('ok')
@@ -270,7 +270,7 @@
           }
         })
         .change(function() {
-          if (/[ -~]{8,}/.test($(this).val())) {
+          if (/^[ -~]{8,}$/.test($(this).val())) {
             $(this)
               .removeClass('error')
               .addClass('ok')
