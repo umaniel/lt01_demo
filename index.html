@@ -138,19 +138,19 @@
           nowSelect: 'jq',
         },
         computed: {
-          wrapCls: function() {
+          wrapCls() {
             return this.isMask ? 'hide' : 'show'
           },
-          inputType: function() {
+          inputType() {
             return this.isMask ? 'text' : 'password'
           },
-          isValidChk: function() {
+          isValidChk() {
             return /[ -~]{8,}/.test(this.strPassword)
           },
-          errChkCls: function() {
+          errChkCls() {
             return this.isValidChk ? 'ok' : 'error'
           },
-          strNotice: function() {
+          strNotice() {
             return this.isValidChk ? 'OK' : 'ERROR'
           },
         },
