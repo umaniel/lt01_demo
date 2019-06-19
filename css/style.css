@@ -6,11 +6,10 @@
   font-family: 'typicons';
   src: url('typicons.ttf');
 }
-body{
-  font-family: -apple-system,BlinkMacSystemFont,Segoe UI,Helvetica Neue,Hiragino Kaku Gothic ProN,"メイリオ",meiryo,sans-serif;
 
+body {
+	font-family: Verdana, Roboto, "Droid Sans", "游ゴシック", YuGothic, "メイリオ", Meiryo, "ヒラギノ角ゴ ProN W3", "Hiragino Kaku Gothic ProN", "ＭＳ Ｐゴシック", sans-serif;
 }
-
 [class*='icon'] {
   font-family: 'typicons', 'entypo';
   cursor: pointer;
